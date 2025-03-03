@@ -1,0 +1,72 @@
+[
+    {
+        "title": "Joliet, IL",
+		"location": {
+            "lat": 41.5250,
+            "lng": -88.0817
+        }
+    },
+    {
+		"title": "Madrid, Spain",
+        "location": {
+            "lat": 40.4168,
+            "lng": -3.7038
+        }
+	},
+    {
+		"title": "Manchester, England",
+        "location": {
+            "lat": 53.4808,
+            "lng": -2.2426
+        }
+    }, 
+    {
+		"title": "Edinburgh, Scotland",
+        "location": {
+            "lat": 55.9533,
+            "lng": -3.1883
+        }
+    },
+    {
+		"title": "Tokyo, Japan",
+        "location": {
+            "lat": 35.6762,
+            "lng": 139.6503
+        }
+    }, 
+    {
+		"title": "Jalisco, Mexico",
+        "location": {
+            "lat": 20.6595,
+            "lng": -103.3494
+        }
+	},
+    {
+		"title": "Lucerne, Switzerland",
+        "location": {
+            "lat": 47.0502,
+            "lng": 8.3093
+        }
+	},
+    {
+		"title": "Bali, Indonesia",
+        "location": {
+            "lat": -8.3405,
+            "lng": 115.0920
+        }
+    },
+    {
+		"title": "Grindavik, Iceland",
+        "location": {
+            "lat": 63.8434,
+            "lng": -22.4360
+        }
+	}, 
+    {
+		"title": "Santorini, Greece",
+        "location": {
+            "lat": 36.3932,
+            "lng": 25.4615
+        }
+    }
+]
