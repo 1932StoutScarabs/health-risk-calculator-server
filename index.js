@@ -7,6 +7,7 @@ const port = process.env.PORT || 3000
 
 
 // Use Express to publish static HTML, CSS, and JavaScript files that run in the browser. 
+app.use(express.json())
 app.use(express.static(__dirname + '/static'))
 app.use(cors({ origin: '*' }))
 
@@ -17,29 +18,26 @@ app.get('/api/ping', (request, response) => {
 	response.send('ping response')
 })
 
-app.get('/calc-risk', (req, res) => {
-	/*res.send(`This is a message hehe! 
-		---------------------
-		Fam Disease: ${calculateFamDis(2)}
-		---------------------
-		Age Risk: ${calculateAgeRisk(46)}
-		---------------------
-		Blood Pressure: ${calculateBP("elevated")}
-		---------------------
-		BMI Risk: ${calculateBMIRisk(calculateBMI())}
-		---------------------
-		`)
-		*/
-	res.send(calculateRisk(/* This is where we will get the paramters from the user so we can do calculations, IDK how yet though*/))
+app.post('/calc-risk', (req, res) => {
+    //Receive JSON with FamilyDiseaseCount, age, bloodPressure, feet of height, inches of height, and weight
+    const { familyDiseaseCount, age, bloodPressure, heightFeet, heightInches, weight } = req.body;
 
-})
+    if(familyDiseaseCount === undefined || age === undefined || !bloodPressure || heightFeet === undefined || heightInches === undefined || weight === undefined){
+        return res.status(400).json({ error: "Missing required parameters" });
+    }
 
-function calculateRisk(famDisVal, ageRiskVal, bpVal, BMIHeight, BMIWeight ){
-	// this will be the eventual risk calculation that will be returned through /calc-risk
+    const totalHeightInches = heightFeet * 12 + heightInches;
+
+    //Send BMI and Risk in back to client in JSON
+    res.json(calculateRisk(familyDiseaseCount, age, bloodPressure, totalHeightInches, weight))
+});
+
+function calculateRisk(familyDiseaseCount, age, bloodPressure, height, weight){
 	try {
+		const BMI = calculateBMI(height, weight)
 		return({
-			BMI: parseInt(calculateBMI(BMIHeight, BMIWeight)),
-			Risk: calculateFamDis(famDisVal) + calculateAgeRisk(ageRiskVal) + calculateBP(bpVal) + calculateBMIRisk(calculateBMI(BMIHeight, BMIWeight))
+			BMI: BMI.toFixed(2),
+			Risk: calculateFamDis(familyDiseaseCount) + calculateAgeRisk(age) + calculateBP(bloodPressure) + calculateBMIRisk(BMI)
 		})
 		// BMI and Risk are the values in the JSON object that we will be returning, to be used in the HTML.
 	} catch (exception){
@@ -104,23 +102,14 @@ function calculateBP(BPValue /*This param is the type of bloodpressure will be a
 	}
 }
 
-function calculateBMIRisk(BMIVal /* This will be the BMI value */){
-	// Switch statements dont support ranges between values so I had to use an if-else statement here.
-	if(BMIVal >= 18.5 && BMIVal <= 24.9){
-		return 0
-	}else if(BMIVal >= 25 && BMIVal <= 29.9){
-		return 30
-	}else if(BMIVal >= 30 && BMIVal <= 34.9){
-		return  75
-	}else{
-		return "err"
-	}
+function calculateBMIRisk(BMI){
+	if(BMI >= 18.5 && BMI <= 24.9) return 0
+	else if(BMI >= 25 && BMI <= 29.9) return 30
+	else return  75
 }
 
 function calculateBMI(heightIN, weightLBS /*These will be the input parameters in the future*/){
 	console.log("Calculating BMI now!")
-	weightLBS = 167 // Change these to parameterized values in the future
-	heightIN = 67 // Change these to parameterized values in the future
 	bmi = convertToKg(weightLBS) / (convertToM2(heightIN))
 	console.log(bmi)
 	return bmi
