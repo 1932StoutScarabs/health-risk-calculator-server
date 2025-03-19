@@ -13,9 +13,7 @@ app.use(cors({ origin: '*' }))
 
 // The app.get functions below are being processed in Node.js running on the server.
 app.get('/api/ping', (request, response) => {
-	console.log('Calling "/api/ping"')
-	response.type('text/plain')
-	response.send('ping response')
+	response.type('text/plain').send('Server is awake');
 })
 
 app.post('/calc-risk', (req, res) => {
@@ -35,9 +33,20 @@ app.post('/calc-risk', (req, res) => {
 function calculateRisk(familyDiseaseCount, age, bloodPressure, height, weight){
 	try {
 		const BMI = calculateBMI(height, weight)
+		const risk = calculateFamDis(familyDiseaseCount) + calculateAgeRisk(age) + calculateBP(bloodPressure) + calculateBMIRisk(BMI)
+		let riskLevel;
+		if (risk < 20 ){
+			riskLevel = "Low Risk"
+		} else if (risk >= 20 && risk <= 50){
+			riskLevel = "Moderate Risk"
+		} else if (risk >= 50 && risk <= 75){
+			riskLevel = "High Risk"
+		} else {
+			riskLevel = "Uninsurable"
+		}
 		return({
 			BMI: BMI.toFixed(2),
-			Risk: calculateFamDis(familyDiseaseCount) + calculateAgeRisk(age) + calculateBP(bloodPressure) + calculateBMIRisk(BMI)
+			Risk: riskLevel
 		})
 		// BMI and Risk are the values in the JSON object that we will be returning, to be used in the HTML.
 	} catch (exception){
@@ -46,16 +55,16 @@ function calculateRisk(familyDiseaseCount, age, bloodPressure, height, weight){
 	}
 }
 
-function calculateFamDis(famDisValue /*This is the amount of family disease they have (1-3)*/){
+function calculateFamDis(familyDiseaseCount /*This is the amount of family disease they have (1-3)*/){
 	// This will calculate the points associated with family disease.
 	// This value should be the amount of family diseases that a person has, instead of individual, making calculations easier.
-	if (famDisValue == 1){
+	if (familyDiseaseCount == 1){
 		return parseInt(10)
-	} else if (famDisValue == 2){
+	} else if (familyDiseaseCount == 2){
 		return parseInt(20) 
-	} else if (famDisValue == 3){
+	} else if (familyDiseaseCount == 3){
 		return parseInt(30)
-	} else if (famDisValue == 0) {
+	} else if (familyDiseaseCount == 0) {
 		return parseInt(0)
 	} else {
 		return null //default value for invalid parameter just in case.
@@ -63,24 +72,19 @@ function calculateFamDis(famDisValue /*This is the amount of family disease they
 }
 function calculateAgeRisk(AgeValue /*This param is the age value*/){
 	// This will calculate the points assocaited with age
-	switch (AgeValue){
-		case (AgeValue < 30):
-			//statment here
-			return parseInt(0)
-		case (AgeValue < 45):
-			//statement here
-			return parseInt(10)
-		case (AgeValue < 60):
-			//statement here
-			return parseInt(20)
-		case (AgeValue):
-			//statment for value above or below these.	
-			return parseInt(30)
+	if (AgeValue < 30) {
+		return parseInt(0);
+	} else if (AgeValue < 45) {
+		return parseInt(10);
+	} else if (AgeValue < 60) {
+		return parseInt(20);
+	} else {
+		return parseInt(30); // For 60+
 	}
 }
-function calculateBP(BPValue /*This param is the type of bloodpressure will be a string */){
+function calculateBP(bloodPressure /*This param is the type of bloodpressure will be a string */){
 	// This will calculate the points associated with bloodpressure
-	switch (BPValue){
+	switch (bloodPressure){
 		case "normal":
 			//statement here all are value points being returned
 			return parseInt(0)
